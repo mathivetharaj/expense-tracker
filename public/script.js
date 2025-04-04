@@ -1,6 +1,7 @@
 const form = document.querySelector('#expense-form form');
 const tableBody = document.querySelector('#expense-table-body');
 
+
 // Load expenses on page load
 window.addEventListener('load', fetchExpenses);
 
@@ -40,6 +41,7 @@ async function fetchExpenses() {
             <td>${expense.category}</td>
             <td>${expense.spend_mode}</td>
             <td>${expense.date}</td>
+           <td><button onclick="deleteExpense(${expense.id})">Delete</button></td
         `;
         tableBody.appendChild(row);
     });
@@ -49,4 +51,30 @@ async function fetchExpenses() {
     if (document.querySelector('#total-amount')) {
         document.querySelector('#total-amount').textContent = total.toFixed(2);
     }
+
+    const categoryTotals = expenses.reduce((acc, exp) => {
+        acc[exp.category] = (acc[exp.category] || 0) + parseFloat(exp.amount);
+        return acc;
+    }, {});
+    const totalsDiv = document.querySelector('#category-totals');
+    totalsDiv.innerHTML = Object.entries(categoryTotals)
+        .map(([cat, total]) => `<p>${cat}: $${total.toFixed(2)}</p>`)
+        .join('');
+
+    const spendModeTotals = expenses.reduce((acc, exp) => { 
+        acc[exp.spend_mode] = (acc[exp.spend_mode] || 0) + parseFloat(exp.amount);
+        return acc;
+    }
+    , {});
+    const spendModeDiv = document.querySelector('#spend-mode-totals');
+    spendModeDiv.innerHTML = Object.entries(spendModeTotals)
+        .map(([mode, total]) => `<p>${mode}: $${total.toFixed(2)}</p>`)
+        .join('');
+}
+function deleteExpense(id) {
+    fetch(`/api/expenses/${id}`, {
+        method: 'DELETE'
+    }).then(() => {
+        fetchExpenses();
+    });
 }
