@@ -14,8 +14,8 @@ jobs:
       - run: npm install
       - run: npx vitest run
       - run: npx playwright test
-    env:
-      DB_URL: ${{ secrets.DB_URL }}
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
   deploy:
     needs: test
     runs-on: ubuntu-latest
@@ -24,4 +24,5 @@ jobs:
       - name: Deploy
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-        run: curl -X POST -H "Authorization: Bearer $RENDER_API_KEY" https://api.render.com/v1/services/srv-cvvp8kbe5dus73ch1jo0/deploys
+        run: |
+          curl -X POST -H "Authorization: Bearer $RENDER_API_KEY" https://api.render.com/v1/services/srv-cvvp8kbe5dus73ch1jo0/deploys
