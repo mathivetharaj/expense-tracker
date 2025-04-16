@@ -15,22 +15,26 @@ form.addEventListener('submit', async (event) => {
     const date = document.querySelector('#date').value;
 
     // Send to backend
-    await fetch('/api/expenses', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount, category, spend_mode,date })
-    });
+    try {
+        const response = await fetch('/api/expenses', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount, category, spend_mode,date })
+        });
+        if (!response.ok) throw new Error((await response.json()).error);
+        fetchExpenses();
+        form.reset();
+    } catch (error) {
+        alert(`Error adding expense: ${error.message}`);
+    }
 
-    // Refresh table
-    fetchExpenses();
-
-    // Clear form
-    form.reset();
-});
+  });
 
 // Fetch and render expenses
 async function fetchExpenses() {
+    try{
     const response = await fetch('/api/expenses');
+    if (!response.ok) throw new Error('Failed to fetch expenses');
     const expenses = await response.json();
 
     tableBody.innerHTML = '';
@@ -58,7 +62,7 @@ async function fetchExpenses() {
     }, {});
     const totalsDiv = document.querySelector('#category-totals');
     totalsDiv.innerHTML = Object.entries(categoryTotals)
-        .map(([cat, total]) => `<p>${cat}: $${total.toFixed(2)}</p>`)
+        .map(([cat, total]) => `<p>${cat}: AED ${total.toFixed(2)}</p>`)
         .join('');
 
     const spendModeTotals = expenses.reduce((acc, exp) => { 
@@ -68,13 +72,18 @@ async function fetchExpenses() {
     , {});
     const spendModeDiv = document.querySelector('#spend-mode-totals');
     spendModeDiv.innerHTML = Object.entries(spendModeTotals)
-        .map(([mode, total]) => `<p>${mode}: $${total.toFixed(2)}</p>`)
+        .map(([mode, total]) => `<p>${mode}: AED ${total.toFixed(2)}</p>`)
         .join('');
-}
-function deleteExpense(id) {
-    fetch(`/api/expenses/${id}`, {
-        method: 'DELETE'
-    }).then(() => {
+}catch(error){
+    console.error('Error fetching expenses:', error);
+    alert('Failed to load expenses. Please try again later.');
+}}
+async function deleteExpense(id) {
+    try {
+        const response = await fetch(`/api/expenses/${id}`, { method: 'DELETE' });
+        if (!response.ok) throw new Error((await response.json()).error);
         fetchExpenses();
-    });
+    } catch (error) {
+        alert(`Error deleting expense: ${error.message}`);
+    }
 }
