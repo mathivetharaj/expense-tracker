@@ -4,6 +4,8 @@ import helmet from "helmet";
 import pool from "./database.js";
 import 'dotenv/config.js';
 
+//update to trigger the github action
+
 const app=express();
 const port = process.env.PORT || 3000;
 
