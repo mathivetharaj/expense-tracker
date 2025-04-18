@@ -5,17 +5,20 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      DB_URL: ${{ secrets.DB_URL }}
     steps:
       - uses: actions/checkout@v3
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-      - run: npm install
-      - run: npx vitest run
-      - run: npx playwright test
-        env:
-          DB_URL: ${{ secrets.DB_URL }}
+      - name: Install dependencies
+        run: npm install
+      - name: Run Vitest
+        run: npx vitest run
+      - name: Run Playwright
+        run: npx playwright test
   deploy:
     needs: test
     runs-on: ubuntu-latest
