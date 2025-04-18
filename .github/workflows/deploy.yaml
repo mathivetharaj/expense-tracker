@@ -15,12 +15,14 @@ jobs:
           node-version: '18'
       - name: Install dependencies
         run: npm install
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
       - name: Run Vitest
         run: npx vitest run
       - name: Run Playwright
         run: npx playwright test
   deploy:
-    needs: test
+    needs: test # Ensure the test job is completed before deploying
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
