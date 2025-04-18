@@ -4,7 +4,7 @@ export default defineConfig({
     testDir: './tests/ui',
     use: {
         baseURL: 'http://localhost:3000',
-        headless: false,
+        headless: true,
     },
     webServer: {
         command: 'node server.js',
